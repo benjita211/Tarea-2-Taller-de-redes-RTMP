@@ -1,0 +1,33 @@
+services:
+  srs-server:
+    image: ossrs/srs:5
+    container_name: srs-server
+    ports:
+      - "1935:1935"
+      - "1985:1985"
+      - "8080:8080"
+    command: ./objs/srs -c conf/rtmp.conf
+    networks:
+      red_rtmp:
+        ipv4_address: 172.28.0.10
+
+  vlc-client:
+    build:
+      context: .
+      dockerfile: Dockerfile.cliente
+    container_name: vlc-client
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    volumes:
+      - ./capturas:/capturas
+    networks:
+      red_rtmp:
+        ipv4_address: 172.28.0.20
+
+networks:
+  red_rtmp:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/24
